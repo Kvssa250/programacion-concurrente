@@ -1,13 +1,13 @@
 from tkinter import *
 from time import strftime, sleep
-from concurrent.futures import ThreadPoolExecutor
+import threading
 
 timer = 0
 semaforo_estado = "Verde"
 semaforo_color = "#00FF00"
 
 # Función para actualizar la hora, día y fecha en la interfaz
-def update_clock():
+def update_reloj():
     while True:
         time_string = strftime("%I:%M:%S %p")
         day_string = strftime("%A")
@@ -65,9 +65,12 @@ date_label.pack()
 semaforo_label = Label(window, font=("Cascadia Code", 25, "bold"), fg="#000000", text=semaforo_estado, width=10, bg=semaforo_color)
 semaforo_label.pack(pady=10)
 
-# Creacion de los hilos para separar las actualizaciones
-with ThreadPoolExecutor(max_workers=2) as executor:
-    executor.submit(update_clock)
-    executor.submit(update_semaforo)
+# Creacion de los hilos para las actualizaciones
+reloj_thread = threading.Thread(target=update_reloj, daemon=True)
+semaforo_thread = threading.Thread(target=update_semaforo, daemon=True)
+
+# Inicialización de los hilos
+reloj_thread.start()
+semaforo_thread.start()
 
 window.mainloop()
